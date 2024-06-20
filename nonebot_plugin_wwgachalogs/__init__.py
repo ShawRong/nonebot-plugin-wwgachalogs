@@ -34,9 +34,19 @@ __plugin_meta__ = PluginMetadata(
     # 若插件可以保证兼容所有适配器（即仅使用基本适配器功能）可不填写，否则应该列出插件支持的适配器。
 )
 
-wwgacha_bind_info = on_command("鸣潮抽卡信息绑定")
-wwgacha_get_gachalogs = on_command("抽卡记录", aliases={"抽卡记录查询"})
-wwgacha_help = on_command("抽卡记录帮助")
+wwgacha_bind_info = on_command("鸣潮抽卡信息绑定", aliases={"mcbind"})
+wwgacha_get_gachalogs = on_command("抽卡记录", aliases={"mclog"})
+wwgacha_command_help = on_command("鸣潮操作帮助", aliases={"mchelp"})
+wwgacha_help = on_command("抽卡记录帮助", aliases={"mchelp2"})
+
+@wwgacha_command_help.handle()
+async def handle_wwgacha_command_help():
+    await wwgacha_help.finish("""
+        mchelp
+        mchelp2
+        mcbind
+        mclog
+""")
 
 @wwgacha_bind_info.handle()
 async def handle_wwgacha_bind_info(event: GroupMessageEvent, state: T_State, session: async_scoped_session, args: Message = CommandArg()):
@@ -134,3 +144,5 @@ async def handle_wwgacha_help():
         6.发送 "鸣潮抽卡信息绑定 player_id record_id" 即可绑定抽卡信息，可长期使用
         例如：鸣潮抽卡信息绑定 100123456 b3545192e2d8ac6a6b0d069e6f54e83f
 """)
+
+
