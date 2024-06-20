@@ -34,28 +34,46 @@ __plugin_meta__ = PluginMetadata(
     # 若插件可以保证兼容所有适配器（即仅使用基本适配器功能）可不填写，否则应该列出插件支持的适配器。
 )
 
-wwgacha_bind_info = on_command("鸣潮抽卡信息绑定")
 wwgacha_get_gachalogs = on_command("抽卡记录", aliases={"抽卡记录查询"})
 wwgacha_help = on_command("抽卡记录帮助")
 
+# it should be abc
+class id:
+    checklen = 0
+    def __init__(self, str):
+        self.id = str
+        self.valid = self.__check__(self.id)
+    def valid():
+        return self.valid
+    def id():
+        return self.id
+    def __check__(id):
+        if len(id) == self.checklen:
+            return True
+        else:
+            return False
+
+class playerid(id):
+    checklen = 9
+
+class recordid(id):
+    checklen = 32
+        
+
+wwgacha_bind_info = on_command("鸣潮抽卡信息绑定")
 @wwgacha_bind_info.handle()
 async def handle_wwgacha_bind_info(event: GroupMessageEvent, state: T_State, session: async_scoped_session, args: Message = CommandArg()):
     info_list = args.extract_plain_text().split()
     if len(info_list) != 2:
         await wwgacha_bind_info.finish("参数个数有误，应为playerid和recordid")
 
-    playerid = ""
-    recordid = ""
-    for info in info_list:
-        if len(info) == 9:
-            playerid = info
-        if len(info) == 32:
-            recordid = info
+    playerid = playerid(info_list[0])
+    recordid = recordid(info_list[1])
     
-    if playerid == "" or recordid == "":
+    if !playerid.valid() or !recordid.valid():
         await wwgacha_bind_info.finish("playerid应为9位，recordid应为32位，请检查")
 
-    uncheck_user = UserInfo(userid=event.user_id, playerid=playerid, recordid=recordid)
+    uncheck_user = UserInfo(userid=event.user_id, playerid=playerid.id(), recordid=recordid.id())
     # 检查用户信息是否有效
     gachalogs = GachaLogs(user=uncheck_user)
     if not await gachalogs.check_user_info():
