@@ -91,8 +91,21 @@ async def _(state: T_State, session: async_scoped_session):
     else:
         await wwgacha_bind_info.finish(f"取消覆盖")
 
+#should be put into util.py or make a new class gacha_log_dict
+def gacha_log_print(gacha_log_dict):
+    msg = ""
+    for gacha_type in CardPoolTypes:
+        gold_info_list = gacha_log_dict[gacha_type.name].get_gold_info_list()
+        logger.debug(gold_info_list)
+        info = f"{gacha_type.name}:"
+        for gold_info in gold_info_list:
+            name = gold_info['name']
+            gacha_num = gold_info['gacha_num']
+            info += f"{name}:[{gacha_num}] "
 
-
+        msg += info + "\n"
+    return msg
+    
 @wwgacha_get_gachalogs.handle()
 async def handle_wwgacha_get_gachalogs(event: GroupMessageEvent, session: async_scoped_session):
     userid = event.user_id
@@ -106,20 +119,8 @@ async def handle_wwgacha_get_gachalogs(event: GroupMessageEvent, session: async_
     gacha_log_dict = await gachalogs.get_gacha_info()
     if gacha_log_dict == None:
         await wwgacha_get_gachalogs.finish("抽卡记录获取有误，请重试")
-
-    msg = ""
-    for gacha_type in CardPoolTypes:
-        gold_info_list = gacha_log_dict[gacha_type.name].get_gold_info_list()
-        logger.debug(gold_info_list)
-        info = f"{gacha_type.name}:"
-        for gold_info in gold_info_list:
-            name = gold_info['name']
-            gacha_num = gold_info['gacha_num']
-            info += f"{name}:[{gacha_num}] "
-
-        msg += info + "\n"
-
-
+        
+    gacha_log_print(gacha_log_dict)
     await wwgacha_get_gachalogs.finish(msg)
 
 
